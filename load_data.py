@@ -1,10 +1,12 @@
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
+from torchvision import transforms
 import torchvision.transforms.functional as TF
 import os
 from PIL import Image
+import numpy as np
+import pickle
 
 
 class VQADataset(Dataset):
@@ -51,28 +53,71 @@ class VQADataset(Dataset):
 		else:
 			return image, question
 
-def create_dataloader(batch_size=8, transform=transforms.ToTensor(), image_dir='./datasets/VQAimages/train2014', data_csv='./datasets/train_3000_data.csv', extras={}):
+
+def create_dataloader(config, transform=transforms.ToTensor(), image_dir='./datasets/VQAimages/train2014', data_csv='./datasets/train_3000_data.csv'):
 	vqa_dataset = VQADataset(transform, image_dir, data_csv)
 
-	num_workers = 0
-	pin_memory = False
-	if extras:       #CUDA
-		num_workers = extras["num_workers"]
-		pin_memory = extras["pin_memory"]
+	batch_size = config['batch_size']
+	num_workers = config['num_workers']
+	pin_memory = config['pin_memory']
 
 	dataloader = DataLoader(dataset=vqa_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 	
 	return dataloader
 
-def read_embeds():
-    pass
-    # TODO: Read embeddings from text file
+
+def get_vocab(fname):
+	ctr = 0
+	vocab = {}
+	for l in open(fname, 'r'):
+		temp = l.strip().split(',')
+		ques = temp[1].split()
+		for t in ques:
+			if t not in vocab:
+				vocab[t] = ctr
+				ctr += 1
+
+	return vocab
 
 
-def get_embeds():
-    pass
-    # TODO: Fetch relevant embeddings and return to main
+def read_embeds(fname):
+	data = []
+	i = 0
+	word2idx = {}
+	for l in open(fname, 'r'):
+		temp = l.strip().split()
+		data.append(np.array([float(x) for x in temp[1:]]))
+		word2idx[temp[0]] = i
+		i += 1
 
-val_loader = create_dataloader(batch_size=2, transform=transforms.Resize((224,224)), image_dir='./datasets/VQAimages/val2014', data_csv='./datasets/val_3000_data.csv')
-for images, questions, answers in val_loader:
-	print images.size(), questions, answers
+	embeddings = np.array(data)
+	return embeddings, word2idx
+
+
+def get_embeds(data_dir, dataset, orig_vocab, em_fname):
+	vocab_path = data_dir + dataset + '_vocab.pickle'
+	embed_path = data_dir + dataset + '_embed.pickle'
+
+	if os.path.exists(vocab_path):
+		with open(vocab_path, 'rb') as f:
+			vocab = pickle.load(f)
+		with open(embed_path, 'rb') as f:
+			embed = pickle.load(f)
+	else:
+		embeddings, word2idx = read_embeds(em_fname)
+		embeds = [0] * len(orig_vocab)
+		for v in orig_vocab:
+			if v in word2idx:
+				embeds[orig_vocab[v]] = embeddings[word2idx[v]]
+			else:
+				embeds[orig_vocab[v]] = np.random.normal(scale=0.25, size=embeddings.shape[1])
+		embeds.append(np.zeros(embeddings.shape[1]))
+		embed = np.array(embeds)
+		vocab = orig_vocab
+
+		with open(vocab_path, 'wb') as f:
+			pickle.dump(vocab, f)
+		with open(embed_path, 'wb') as f:
+			pickle.dump(embed, f)
+
+	return vocab, embed

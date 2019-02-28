@@ -1,31 +1,61 @@
 import torch
+from torchvision import transforms
 import warnings
 from cfg import *
-from models import *
+from models import JointEmbedModel
 from eval import test
-from load_data import get_embeds
+from load_data import get_embeds, create_dataloader, get_vocab
+from trainer import train
 
 
 def main():
     data_dir = config['data_dir']
     dataset = config['dataset']
+    train_image_dir = data_dir + config['train_img_dir']
+    val_image_dir = data_dir + config['val_img_dir']
+    test_image_dir = data_dir + config['test_img_dir']
+    train_csv = data_dir + 'train_' + dataset + '_data.csv'
+    val_csv = data_dir + 'val_' + dataset + '_data.csv'
+    test_csv = data_dir + 'test-dev_data.csv'
+    transform_steps = transforms.Resize((224, 224))
 
-    # TODO: Initialize Dataloader
+    train_dataloader = create_dataloader(config, transform_steps, train_image_dir, train_csv)
+    val_dataloader = create_dataloader(config, transform_steps, val_image_dir, val_csv)
+    test_dataloader = create_dataloader(config, transform_steps, test_image_dir, test_csv)
+    vocab = get_vocab(train_csv)
+    vocab, embeds = get_embeds(data_dir, dataset, vocab, config['em_fname'])
+    vlen = len(vocab)
 
     if config['train'] is True:
-        pass
-        # TODO: Initialize Model and Model config
+        if config['model'] == 'JointEmbedModel':
+            use_config = jointembedmodel_cfg
+            use_config['name'] = 'JointEmbedModel_' + dataset + '_'
+            use_config['maxlen'] = config['maxlen']
+            use_config['n_classes'] = int(dataset)
+            model = JointEmbedModel(use_config, vlen, embeds)
 
-        # TODO: Print Model and Number of Parameters
+        print('\n', model)
+        print("Number of Parameters : ", sum(p.numel() for p in model.parameters() if p.requires_grad), '\n')
 
-        # TODO: Call train from trainer
+        train(model, use_config, train_dataloader, val_dataloader, vocab)
+
     else:
-        pass
-        # TODO: Load model for testing
+        test_model = config['test_model'].split('/')[1]
+        if test_model == '':
+            raise ValueError('Please pass a model path to test')
 
-        # TODO: Print Model and Number of Parameters
+        if 'JointEmbedModel' in test_model:
+            use_config = jointembedmodel_cfg
+            use_config['name'] = 'JointEmbedModel_' + dataset + '_'
+            use_config['maxlen'] = config['maxlen']
+            use_config['n_classes'] = int(dataset)
 
-        # TODO: Get the test results
+        model = torch.load(config['test_model'])
+        model.to(torch.device("cpu"))
+        print('\n', model)
+        print("Number of Parameters : ", sum(p.numel() for p in model.parameters() if p.requires_grad), '\n')
+
+        test(model, use_config, test_dataloader, vocab)
 
 
 if __name__ == "__main__":
