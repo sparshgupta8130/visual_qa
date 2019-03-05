@@ -1,3 +1,5 @@
+import sys
+import os
 import torch
 from torchvision import transforms
 import warnings
@@ -17,7 +19,11 @@ def main():
     train_csv = data_dir + 'train_' + dataset + '_data.csv'
     val_csv = data_dir + 'val_' + dataset + '_data.csv'
     test_csv = data_dir + 'test-dev_data.csv'
-    transform_steps = transforms.Resize((224, 224))
+    transform_steps = transforms.Compose([
+    	transforms.Resize((224,224)),
+    	transforms.ToTensor(),
+    	transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+	])
 
     train_dataloader = create_dataloader(config, transform_steps, train_image_dir, train_csv)
     val_dataloader = create_dataloader(config, transform_steps, val_image_dir, val_csv)
@@ -37,7 +43,10 @@ def main():
         print('\n', model)
         print("Number of Parameters : ", sum(p.numel() for p in model.parameters() if p.requires_grad), '\n')
 
-        train(model, use_config, train_dataloader, val_dataloader, vocab)
+        try:
+        	train(model, use_config, train_dataloader, val_dataloader, vocab)
+        except KeyboardInterrupt:
+        	print('Exiting early from training.')
 
     else:
         test_model = config['test_model'].split('/')[1]
@@ -59,6 +68,6 @@ def main():
 
 
 if __name__ == "__main__":
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        main()
+	with warnings.catch_warnings():
+		warnings.simplefilter("ignore")
+		main()

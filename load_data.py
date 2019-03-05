@@ -48,10 +48,10 @@ class VQADataset(Dataset):
 		question = self.data_questions.ix[ind]
 
 		if not self.test:
-			answer = torch.tensor(self.data_answers.ix[ind])
-			return image, question, answer
+			answer = torch.tensor(int(self.data_answers.iloc[ind]))
+			return (image, question, answer)
 		else:
-			return image, question
+			return (image, question)
 
 
 def create_dataloader(config, transform=transforms.ToTensor(), image_dir='./datasets/VQAimages/train2014', data_csv='./datasets/train_3000_data.csv'):
@@ -84,7 +84,7 @@ def read_embeds(fname):
 	data = []
 	i = 0
 	word2idx = {}
-	for l in open(fname, 'r'):
+	for l in open(fname, 'r', encoding='utf-8'):
 		temp = l.strip().split()
 		data.append(np.array([float(x) for x in temp[1:]]))
 		word2idx[temp[0]] = i
