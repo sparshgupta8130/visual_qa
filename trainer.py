@@ -4,6 +4,8 @@ from torch.autograd import Variable
 import time
 from utils import create_directory, get_time_prefix, get_indices
 import gc
+import os
+import sys
 
 
 def print_loss(i, t_loss, v_loss, st_time, en_time):
@@ -33,7 +35,8 @@ def forward_pass(model, config, images, questions, vocab, answers=None, criterio
 	device = torch.device("cuda:0" if config['GPU'] is True else "cpu")
 
 	images = Variable(images).to(device)
-	q_idxs = get_indices(questions, vocab, config['maxlen']).to(device)
+	# q_idxs = get_indices(questions, vocab, config['maxlen']).to(device)
+	q_idxs = Variable(questions).to(device)
 
 	out = model(images, q_idxs)
 
@@ -55,6 +58,7 @@ def forward_pass(model, config, images, questions, vocab, answers=None, criterio
 
 
 def train(model, config, train_dataloader, val_dataloader, vocab):
+
 	obs_path = './observations/'
 	mod_path = './saved_models/'
 	create_directory(obs_path)

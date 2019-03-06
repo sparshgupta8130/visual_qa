@@ -49,7 +49,7 @@ class JointEmbedModel(nn.Module):
 
 
     def forward(self, images, q_idxs):
-        self.lstmq.flatten_parameters()
+        # self.lstmq.flatten_parameters()
         ques_embedded = self.embed(q_idxs)
 
         lstm_out, (hn, cn) = self.lstmq(ques_embedded)
