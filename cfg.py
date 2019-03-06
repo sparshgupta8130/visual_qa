@@ -12,7 +12,7 @@ config['train'] = True
 config['model'] = 'JointEmbedModel'
 config['maxlen'] = 30
 config['batch_size'] = 800
-config['num_workers'] = 1
+config['num_workers'] = 8
 config['pin_memory'] = True
 
 jointembedmodel_cfg = {}
