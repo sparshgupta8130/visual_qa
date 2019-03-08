@@ -26,3 +26,17 @@ jointembedmodel_cfg['lr_decay'] = 0.98
 jointembedmodel_cfg['GPU'] = True
 jointembedmodel_cfg['GPU_Ids'] = [0, 1, 2, 3]
 jointembedmodel_cfg['embedding_dim'] = 300
+
+attentionmodel_cfg = {}
+attentionmodel_cfg['lr'] = 0.001
+attentionmodel_cfg['L2'] = 0
+attentionmodel_cfg['opt'] = optim.Adam
+attentionmodel_cfg['epochs'] = 10
+attentionmodel_cfg['early_stop'] = True
+attentionmodel_cfg['early_stop_epoch'] = 3
+attentionmodel_cfg['lr_decay'] = 0.98
+attentionmodel_cfg['GPU'] = True
+attentionmodel_cfg['GPU_Ids'] = [0, 1, 2, 3]
+attentionmodel_cfg['embedding_dim'] = 300
+attentionmodel_cfg['dropout'] = 0.5
+attentionmodel_cfg['glimpses'] = 2

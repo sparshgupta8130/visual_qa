@@ -4,7 +4,7 @@ import torch
 from torchvision import transforms
 import warnings
 from cfg import *
-from models import JointEmbedModel
+from models import JointEmbedModel, AttentionModel
 from eval import test
 from load_data import get_embeds, create_dataloader, get_vocab
 from trainer import train
@@ -39,6 +39,12 @@ def main():
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
 			model = JointEmbedModel(use_config, vlen, embeds)
+		elif config['model'] == 'AttentionModel':
+			use_config = attentionmodel_cfg
+			use_config['name'] = 'AttentionModel_' + dataset + '_'
+			use_config['maxlen'] = config['maxlen']
+			use_config['n_classes'] = int(dataset)
+			model = AttentionModel(use_config, vlen, embeds)
 
 		print('\n', model)
 		print("Number of Parameters : ", sum(p.numel() for p in model.parameters() if p.requires_grad), '\n')
@@ -56,6 +62,11 @@ def main():
 		if 'JointEmbedModel' in test_model:
 			use_config = jointembedmodel_cfg
 			use_config['name'] = 'JointEmbedModel_' + dataset + '_'
+			use_config['maxlen'] = config['maxlen']
+			use_config['n_classes'] = int(dataset)
+		elif 'AttentionModel' in test_model:
+			use_config = attentionmodel_cfg
+			use_config['name'] = 'AttentionModel_' + dataset + '_'
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
 
