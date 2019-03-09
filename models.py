@@ -77,6 +77,7 @@ class Attention(nn.Module):
     def __init__(self, v_dim, q_dim, mid_dim, glimpses, drop=0.0):
         super(Attention, self).__init__()
         self.glimpses = glimpses
+        self.mid_dim = mid_dim
         self.conv1 = nn.Conv2d(v_dim, mid_dim, 1, bias=False)
         self.fc1 = nn.Linear(q_dim, mid_dim)
         self.conv2 = nn.Conv2d(mid_dim, glimpses, 1)
@@ -88,7 +89,7 @@ class Attention(nn.Module):
         c = v.shape[1]
         x = self.conv1(self.drop(v))
         y = self.fc1(self.drop(q))
-        y = y.view(n, self.glimpses, 1, 1).expand_as(x)
+        y = y.view(n, self.mid_dim, 1, 1).expand_as(x)
         x = self.relu(x + y)
         a = self.conv2(self.drop(x))
 
@@ -142,9 +143,9 @@ class AttentionModel(nn.Module):
     def forward(self, images, q_idxs):
         ques = self.embed(q_idxs)
         ques = self.tanh(self.drop_layer(ques))
-        _, (_, c) = self.lstm(ques)
+        _, (_, c) = self.lstm(ques.permute(1, 0, 2))
         q = c.squeeze(0)
-
+        
         v = self.resnet152(images)
         v = F.normalize(v, p=2, dim=1)
         v = self.attention(v, q)
