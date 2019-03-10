@@ -96,7 +96,7 @@ def train(model, config, train_dataloader, val_dataloader, vocab):
 		model.train()
 		t_loss = 0
 		for minibatch_no, (images, questions, answers) in enumerate(train_dataloader, 1):
-			if (minibatch_no%5 == 0):
+			if (minibatch_no%10 == 0):
 				lr *= config['lr_decay']
 				for param_group in optimizer.param_groups:
 					param_group['lr'] = lr
@@ -106,7 +106,6 @@ def train(model, config, train_dataloader, val_dataloader, vocab):
 			loss = forward_pass(model, config, images, questions, vocab, answers, criterion)
 			loss.backward(retain_graph=True)
 			optimizer.step()
-			print(loss.item())
 
 			if config['GPU'] is True:
 				t_loss += loss.cpu().data.numpy()
