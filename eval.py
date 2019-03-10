@@ -34,6 +34,8 @@ def test(model, config, dataloader, vocab, test=True):
     if config['GPU'] is True:
         model = nn.DataParallel(model, device_ids=config['GPU_Ids'])
 
+    model.eval()
+
     logits = []
     targets = []
     if test is True:

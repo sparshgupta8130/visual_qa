@@ -4,7 +4,7 @@ import torch
 from torchvision import transforms
 import warnings
 from cfg import *
-from models import JointEmbedModel, AttentionModel
+from models import JointEmbedModel, AttentionModel, JointEmbedResNet
 from eval import test
 from load_data import get_embeds, create_dataloader, get_vocab
 from trainer import train
@@ -45,6 +45,12 @@ def main():
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
 			model = AttentionModel(use_config, vlen, embeds)
+        elif config['model'] == 'JointEmbedResNet':
+			use_config = jointembedresnet_cfg
+			use_config['name'] = 'JointEmbedResNet_' + dataset + '_'
+			use_config['maxlen'] = config['maxlen']
+			use_config['n_classes'] = int(dataset)
+			model = JointEmbedResNet(use_config, vlen, embeds)
 
 		print('\n', model)
 		print("Number of Parameters : ", sum(p.numel() for p in model.parameters() if p.requires_grad), '\n')
@@ -69,6 +75,11 @@ def main():
 			use_config['name'] = 'AttentionModel_' + dataset + '_'
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
+        elif 'JointEmbedResNet' in test_model:
+			use_config = jointembedresnet_cfg
+			use_config['name'] = 'JointEmbedResNet_' + dataset + '_'
+			use_config['maxlen'] = config['maxlen']
+			use_config['n_classes'] = int(dataset)
 
 		model = torch.load(config['test_model'])
 		model.to(torch.device("cpu"))
@@ -76,6 +87,8 @@ def main():
 		print("Number of Parameters : ", sum(p.numel() for p in model.parameters() if p.requires_grad), '\n')
 
 		test(model, use_config, test_dataloader, vocab)
+
+		test(model, use_config, val_dataloader, vocab)
 
 
 if __name__ == "__main__":
