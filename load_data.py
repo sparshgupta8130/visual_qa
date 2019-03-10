@@ -77,6 +77,7 @@ def create_dataloader(config, transform=transforms.ToTensor(), image_dir='./data
 	
 	return dataloader
 
+
 class PadCollate:
 	def __init__(self, padding_value=0):
 		self.padding_value = padding_value
@@ -95,6 +96,7 @@ class PadCollate:
 	def __call__(self, batch):
 		return self.pad_collate(batch)
 
+    
 def get_vocab(fname):
 	ctr = 0
 	vocab = {}

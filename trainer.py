@@ -106,7 +106,6 @@ def train(model, config, train_dataloader, val_dataloader, vocab):
 			loss = forward_pass(model, config, images, questions, vocab, answers, criterion)
 			loss.backward(retain_graph=True)
 			optimizer.step()
-			print(loss.item())
 
 			if config['GPU'] is True:
 				t_loss += loss.cpu().data.numpy()
