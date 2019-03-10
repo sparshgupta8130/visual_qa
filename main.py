@@ -45,11 +45,11 @@ def main():
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
 			model = AttentionModel(use_config, vlen, embeds)
-        elif config['model'] == 'JointEmbedResNet':
+		elif config['model'] == 'JointEmbedResNet':
 			use_config = jointembedresnet_cfg
 			use_config['name'] = 'JointEmbedResNet_' + dataset + '_'
 			use_config['maxlen'] = config['maxlen']
-			use_config['n_classes'] = int(dataset)
+		    use_config['n_classes'] = int(dataset)
 			model = JointEmbedResNet(use_config, vlen, embeds)
 
 		print('\n', model)
@@ -75,7 +75,7 @@ def main():
 			use_config['name'] = 'AttentionModel_' + dataset + '_'
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
-        elif 'JointEmbedResNet' in test_model:
+		elif 'JointEmbedResNet' in test_model:
 			use_config = jointembedresnet_cfg
 			use_config['name'] = 'JointEmbedResNet_' + dataset + '_'
 			use_config['maxlen'] = config['maxlen']
