@@ -4,7 +4,7 @@ from torch.autograd import Variable
 import torch
 import torch.nn as nn
 import random
-import skimage.transform
+#import skimage.transform
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
@@ -44,7 +44,7 @@ def get_indices(X, vocab, mlen):
     inds = Variable(torch.LongTensor(idxs))
     return inds
 
-
+"""
 def plot_att(image, alpha, fname):
     plt.imshow(image)
     al = skimage.transform.pyramid_expand(alpha, upscale=32)
@@ -90,3 +90,5 @@ def visualize_att(model, config, dataloader):
             plot_att(ims[i].numpy(), al1, vis_fname + str(ctr) + '_glmp1.png')
             plot_att(ims[i].numpy(), al2, vis_fname + str(ctr) + '_glmp2.png')
             ctr += 1
+"""
+

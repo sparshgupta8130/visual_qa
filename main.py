@@ -8,7 +8,7 @@ from models import JointEmbedModel, AttentionModel, JointEmbedResNet
 from eval import test
 from load_data import get_embeds, create_dataloader, get_vocab
 from trainer import train
-from utils import visualize_att
+#from utils import visualize_att
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
 	val_dataloader = create_dataloader(config, transform_steps, val_image_dir, val_csv, vocab)
 	test_dataloader = create_dataloader(config, transform_steps, test_image_dir, test_csv, vocab)
 	gen_dataloader = create_dataloader(config, transform_steps, val_image_dir, val_csv, vocab, True)
-	vis_dataloader = create_dataloader(config, transform_steps, val_image_dir, vis_csv, vocab)
+	#vis_dataloader = create_dataloader(config, transform_steps, val_image_dir, vis_csv, vocab)
 
 	if config['train'] is True:
 		if config['model'] == 'JointEmbedModel':
@@ -93,7 +93,7 @@ def main():
 		# test(model, use_config, test_dataloader, vocab)
 
 		test(model, use_config, gen_dataloader, vocab, False, True)
-		visualize_att(model, use_config, vis_dataloader)
+		#visualize_att(model, use_config, vis_dataloader)
 
 
 if __name__ == "__main__":
