@@ -245,6 +245,7 @@ class Attention(nn.Module):
 
 
 class AttentionModel(nn.Module):
+
 	def __init__(self, config, vlen, embeds=None):
 		super(AttentionModel, self).__init__()
 		self.vlen = vlen
@@ -279,6 +280,7 @@ class AttentionModel(nn.Module):
 			nn.Linear(1024, config['n_classes']))
 
 	def forward(self, images, q_idxs):
+		#self.lstm.flatten_parameters()
 		ques = self.embed(q_idxs)
 		ques = self.tanh(self.drop_layer(ques))
 		_, (_, c) = self.lstm(ques.permute(1, 0, 2))
