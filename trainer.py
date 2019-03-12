@@ -96,7 +96,7 @@ def train(model, config, train_dataloader, val_dataloader, vocab):
 		model.train()
 		t_loss = 0
 		for minibatch_no, (images, questions, answers) in enumerate(train_dataloader, 1):
-			if (minibatch_no%10 == 0):
+			if (minibatch_no%5 == 0):
 				lr *= config['lr_decay']
 				for param_group in optimizer.param_groups:
 					param_group['lr'] = lr
@@ -112,6 +112,7 @@ def train(model, config, train_dataloader, val_dataloader, vocab):
 			else:
 				t_loss += loss.data.numpy()
 
+			print (loss.item())
 			del loss
 			gc.collect()
 			torch.cuda.empty_cache()

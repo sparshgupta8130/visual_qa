@@ -11,11 +11,12 @@ import pickle
 
 class VQADataset(Dataset):
 
-	def __init__(self, transform=transforms.ToTensor(), image_dir='./datasets/VQAimages/train2014', data_csv='./datasets/train_3000_data.csv', vocab={}, maxlen=30, color='RGB'):
+	def __init__(self, transform=transforms.ToTensor(), image_dir='./datasets/VQAimages/train2014', data_csv='./datasets/train_3000_data.csv', vocab={}, maxlen=30, gen=False, color='RGB'):
 		
 		self.transform = transform
 		self.vocab = vocab
 		self.maxlen = maxlen
+		self.gen = gen
 		self.color = color
 		self.image_dir = image_dir
 		data_all = pd.read_csv(data_csv, sep=",", header=None)
@@ -59,15 +60,18 @@ class VQADataset(Dataset):
 				v.append(len(self.vocab))
 		quesv = torch.LongTensor(v)
 
-		if not self.test:
+		if self.gen:
+			answer = int(self.data_answers.iloc[ind])
+			return (image, quesv, answer, self.data_imgids.ix[ind], question)
+		elif not self.test:
 			answer = int(self.data_answers.iloc[ind])
 			return (image, quesv, answer)
 		else:
 			return (image, quesv)
 
 
-def create_dataloader(config, transform=transforms.ToTensor(), image_dir='./datasets/VQAimages/train2014', data_csv='./datasets/train_3000_data.csv', vocab={}):
-	vqa_dataset = VQADataset(transform, image_dir, data_csv, vocab, config['maxlen'])
+def create_dataloader(config, transform=transforms.ToTensor(), image_dir='./datasets/VQAimages/train2014', data_csv='./datasets/train_3000_data.csv', vocab={}, gen=False):
+	vqa_dataset = VQADataset(transform, image_dir, data_csv, vocab, config['maxlen'], gen)
 
 	batch_size = config['batch_size']
 	num_workers = config['num_workers']
@@ -87,7 +91,12 @@ class PadCollate:
 
 		images = torch.stack(list(map(lambda x: x[0], batch)), dim=0)
 		questions = pad_sequence(list(map(lambda x: x[1], batch)), batch_first=True, padding_value=self.padding_value)
-		if len(batch[0]) == 3:
+		if len(batch[0]) == 5:
+			answers = torch.LongTensor(list(map(lambda x: x[2], batch)))
+			image_ids = torch.LongTensor(list(map(lambda x: x[3], batch)))
+			questions_orig = list(map(lambda x: x[4], batch))
+			return (images, questions, answers, image_ids, questions_orig)
+		elif len(batch[0]) == 3:
 			answers = torch.LongTensor(list(map(lambda x: x[2], batch)))
 			return (images, questions, answers)
 		else:
