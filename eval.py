@@ -26,9 +26,9 @@ def save_results(logits, targets, imgs, ques, corr_fname, incorr_fname):
     fincorr = open(incorr_fname, 'w')
     for i in range(len(logits)):
         if logits[i] == targets[i]:
-            fcorr.write(str(imgs[i]) + ',' + ques[i] + ',' + str(targets[i]) + '\n')
+            fcorr.write(str(imgs[i]) + ',' + ques[i] + ',' + str(logits[i]) + '\n')
         else:
-            fincorr.write(str(imgs[i]) + ',' + ques[i] + ',' + str(targets[i]) + '\n')
+            fincorr.write(str(imgs[i]) + ',' + ques[i] + ',' + str(logits[i]) + '\n')
     fcorr.close()
     fincorr.close()
 
