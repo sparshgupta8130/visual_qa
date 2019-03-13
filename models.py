@@ -221,6 +221,7 @@ class Attention(nn.Module):
 		self.conv2 = nn.Conv2d(mid_dim, glimpses, 1)
 		self.drop = nn.Dropout(drop)
 		self.relu = nn.ReLU()
+		self.alpha = None
 
 	def forward(self, v, q):
 		n = v.shape[0]
@@ -236,6 +237,7 @@ class Attention(nn.Module):
 		s = v.shape[2]
 		a = a.view(n * self.glimpses, -1)
 		a = F.softmax(a, dim=1)
+		self.alpha = a
 		v = v.unsqueeze(1).expand(n, self.glimpses, c, s)
 		a = a.view(n, self.glimpses, -1).unsqueeze(2).expand(n, self.glimpses, c, s)
 		x = v * a

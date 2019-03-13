@@ -8,11 +8,11 @@ config['train_img_dir'] = 'VQAimages/train2014'
 config['val_img_dir'] = 'VQAimages/val2014'
 config['test_img_dir'] = 'VQAimages/test2015'
 config['em_fname'] = 'embeddings/glove.6B.300d.txt'
-config['train'] = False
-config['model'] = 'JointEmbedModel'
+config['train'] = True
+config['model'] = 'AttentionModel'
 config['test_model'] = 'saved_models/2019-03-06__08h30m40s_JointEmbedModel_1000_.pt'
-config['maxlen'] = 30
-config['batch_size'] = 1024
+config['maxlen'] = 15
+config['batch_size'] = 400
 config['num_workers'] = 8
 config['pin_memory'] = True
 
@@ -29,8 +29,8 @@ jointembedmodel_cfg['GPU_Ids'] = [0, 1, 2, 3]
 jointembedmodel_cfg['embedding_dim'] = 300
 
 attentionmodel_cfg = {}
-attentionmodel_cfg['lr'] = 0.001
-attentionmodel_cfg['L2'] = 0
+attentionmodel_cfg['lr'] = 0.0001
+attentionmodel_cfg['L2'] = 0.0002
 attentionmodel_cfg['opt'] = optim.Adam
 attentionmodel_cfg['epochs'] = 15
 attentionmodel_cfg['early_stop'] = True

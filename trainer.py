@@ -112,7 +112,7 @@ def train(model, config, train_dataloader, val_dataloader, vocab):
 			else:
 				t_loss += loss.data.numpy()
 
-			print (loss.item())
+			#print (loss.item())
 			del loss
 			gc.collect()
 			torch.cuda.empty_cache()
