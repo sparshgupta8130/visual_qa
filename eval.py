@@ -21,7 +21,6 @@ def get_accuracy(logits, targets):
     score = corr / tot
     return score
 
-
 def save_results(logits, targets, imgs, ques, corr_fname, incorr_fname):
     fcorr = open(corr_fname, 'w')
     fincorr = open(incorr_fname, 'w')
@@ -32,7 +31,6 @@ def save_results(logits, targets, imgs, ques, corr_fname, incorr_fname):
             fincorr.write(str(imgs[i]) + ',' + ques[i] + ',' + str(logits[i]) + '\n')
     fcorr.close()
     fincorr.close()
-
 
 def test(model, config, dataloader, vocab, test=True, gen=False):
     eval_path = './evaluations/'
