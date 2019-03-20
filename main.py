@@ -54,7 +54,7 @@ def main():
 			model = JointEmbedResNet(use_config, vlen, embeds)
 		elif config['model'] == 'MultihopAttentionModel':
 			use_config = multihopmodel_cfg
-			use_config['name'] = 'MultihopAttentionModel' + dataset + '_'
+			use_config['name'] = 'MultihopAttentionModel_' + dataset + '_'
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
 			model = MultihopAttentionModel(use_config, vlen, embeds)
@@ -89,7 +89,7 @@ def main():
 			use_config['n_classes'] = int(dataset)
 		elif 'MultihopAttentionModel' in test_model:
 			use_config = multihopmodel_cfg
-			use_config['name'] = 'MultihopAttentionModel' + dataset + '_'
+			use_config['name'] = 'MultihopAttentionModel_' + dataset + '_'
 			use_config['maxlen'] = config['maxlen']
 			use_config['n_classes'] = int(dataset)
 
