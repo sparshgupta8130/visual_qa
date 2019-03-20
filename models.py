@@ -153,6 +153,7 @@ class Attention(nn.Module):
 		self.fc1 = nn.Linear(q_dim, mid_dim)
 		self.conv2 = nn.Conv2d(mid_dim, glimpses, 1)
 		self.drop = nn.Dropout(drop)
+		self.alpha = None
 		self.relu = nn.ReLU()
 
 	def forward(self, v, q):
@@ -169,6 +170,7 @@ class Attention(nn.Module):
 		s = v.shape[2]
 		a = a.view(n * self.glimpses, -1)
 		a = F.softmax(a, dim=1)
+		self.alpha = a
 		v = v.unsqueeze(1).expand(n, self.glimpses, c, s)
 		a = a.view(n, self.glimpses, -1).unsqueeze(2).expand(n, self.glimpses, c, s)
 		x = v * a
@@ -235,6 +237,7 @@ class SelfAttention(nn.Module):
 				nn.Dropout(drop),
 				nn.Linear(mid_dim,1))
 		self.softmax = nn.Softmax(dim=1)
+		self.alpha = None
 
 	def forward(self, memory, annotations):
 		batch_size, seq_len, hid_size = annotations.size()
@@ -242,6 +245,7 @@ class SelfAttention(nn.Module):
 		concat = torch.cat((expanded_memory,annotations),2)
 		attention_output = self.attention_network(concat)
 		normalized_attention = self.softmax(attention_output)             # batch_size x seq_len x 1
+		self.alpha = normalized_attention
 		context = torch.sum(normalized_attention*annotations, 1)          # batch_size x hid_size
 
 		return context
@@ -255,6 +259,7 @@ class InteractiveAttention(nn.Module):
 		self.fc1 = nn.Linear(q_dim, mid_dim)
 		self.conv2 = nn.Conv2d(mid_dim, self.glimpses, 1)
 		self.drop = nn.Dropout(drop)
+		self.alpha = None
 		self.relu = nn.ReLU()
 
 	def forward(self, v, q):
@@ -271,6 +276,7 @@ class InteractiveAttention(nn.Module):
 		s = v.shape[2]
 		a = a.view(n * self.glimpses, -1)
 		a = F.softmax(a, dim=1)
+		self.alpha = a
 		v = v.unsqueeze(1).expand(n, self.glimpses, c, s)
 		a = a.view(n, self.glimpses, -1).unsqueeze(2).expand(n, self.glimpses, c, s)
 		x = v * a
