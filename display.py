@@ -9,10 +9,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from utils import *
 
-def random_image(output_csv, image_dir, ans_file):
+def random_image(output_csv, image_dir, ans_file, idx=None):
 	data_all = pd.read_csv(output_csv, sep=",", header=None)
 	data_all.columns = ["img_id", "ques", "ans_id"]
-	ind = random.randint(0, len(data_all))
+	if idx is not None:
+		ind = idx
+	else:
+		ind = random.randint(0, len(data_all))
 
 	data_split = image_dir.split('/')[-1]
 	image_filename = 'COCO_' + data_split + '_000000' + str(data_all["img_id"].ix[ind]).zfill(6) + '.jpg'
@@ -37,11 +40,12 @@ def result_to_jpg(image_filename, image, question, answer, ):
 	plt.axis('off')
 	txt = question + '? ' + answer
 	fig.text(0.5, .05, txt, ha='center')
-	plt.savefig(os.path.join('results/incorr', image_filename))
+	plt.savefig(os.path.join('results/corr', image_filename))
 	plt.close(fig)
 
 if __name__ == "__main__":
-	for i in range(100):
-		image_filename, image, question, answer = random_image('evaluations/2019-03-13__08h03m22s_JointEmbedModel_1000__incorr.csv', 'datasets/VQAimages/val2014', 'datasets/aid_ans_1000.pickle')
-		create_directory('./results/incorr/')
+	pics_list = [53016, 3960, 30548, 10435, 54290, 3974, 20, 1344, 2315, 2932, 778, 1746, 2340, 704, 8880, 47633]
+	for i in range(len(pics_list)):
+		image_filename, image, question, answer = random_image('evaluations/2019-03-20__21h34m07s_AttentionModel_1000__corr.csv', 'datasets/VQAimages/val2014', 'datasets/aid_ans_1000.pickle', pics_list[i])
+		create_directory('./results/corr/')
 		result_to_jpg(image_filename, image, question, answer)
